@@ -1,64 +1,46 @@
 pragma solidity ^0.4.4;
 
-import './IStandardToken.sol';
-import './SafeMath.sol';
-
-contract UppsalaToken is IStandardToken{
+contract UppsalaToken {
     
-    using SafeMath for uint256;
-    
-    uint public constant _totalSupply = 1000000;
-    
+		address public owner;		
+    uint256 public constant _totalSupply = 1000000;
+    uint256 _tokensSold = 0;
     string public constant symbol = "UPP";
     string public constant name = "Uppsala token";
     uint8 public constant decimals = 3;
-    
+		uint256 minFundable = 1 ether;
+		uint256 maxFundable = 10 ether;
+
+		uint256 price = 1 ether / 5000;
+		bool started = false;
+		bool ended = false;
+
     mapping(address => uint256) balances;
-    mapping(address => mapping(address => uint256)) allowed;
     
+		modifier onlyOwner() {
+			require(msg.sender == owner);
+			_;
+		}
+
     function UppsalaToken(){
-        balances[msg.sender] = _totalSupply;
+        owner = msg.sender;
+				balances[msg.sender] = _totalSupply;
     }
-    
-    function totalSupply() constant returns (uint totalSupply){
-        return _totalSupply;
-    }
-    
-    function balanceOf(address _owner) constant returns (uint balance){
+     
+    function balanceOf(address _owner) constant returns (uint256 balance){
         return balances[_owner];
     }
     
-    function transfer(address _to, uint _value) returns (bool success){
-        require(
-            balances[msg.sender] > _value && _value > 0
-        );
-        balances[msg.sender] = balances[msg.sender].sub(_value);
-        balances[_to] = balances[_to].add(_value);
-        Transfer(msg.sender, _to, _value);
-        return true;
-    }
-    
-    function transferFrom(address _from, address _to, uint _value) returns (bool success){
-        require(
-            allowed[_from][msg.sender] >= _value && balances[_from] >= _value && _value > 0
-        );
-        balances[_from] = balances[_from].sub(_value);
-        balances[_to] = balances[_to].add(_value);
-        allowed[_from][msg.sender] = allowed[_from][msg.sender].sub(_value);
-        Transfer(_from, _to, _value);
-        return true;
-    }
-    
-    function approve(address _spender, uint _value) returns (bool success){
-        allowed[msg.sender][_spender] = _value;
-        Approval(msg.sender, _spender, _value);
-        return true;
-    }
-    
-    function allowance(address _owner, address _spender) constant returns (uint remaining){
-        return allowed[_owner][_spender];
-    }
-    
-    event Transfer(address indexed _from, address indexed _to, uint _value);
-    event Approval(address indexed _owner, address indexed _spender, uint _value);
+		function invest() payable{
+			uint256 amount = msg.value;
+			require(amount >= minFundable);
+			require(amount <= maxFundable);
+
+			uint256 numTokens = amount / price;
+
+			require((_tokensSold + numTokens) < _totalSupply);
+
+			_tokensSold += numTokens;
+			balances[msg.sender] = numTokens;
+		}
 }

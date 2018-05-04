@@ -1,12 +1,11 @@
-var UppsalaCrowdsale 
-artifacts.require("./UppsalaCrowdsale.sol");
+var UppsalaCrowdsale = artifacts.require("./UppsalaCrowdsale.sol");
 
-var UppsalaToken
-artifacts.require("./UppsalaToken.sol");
+var UppsalaToken = artifacts.require("./UppsalaToken.sol");
 
-module.exports = function(deployer, accounts) {
+module.exports = function(deployer, network, accounts) {
+	console.log(accounts);
 	return liveDeploy(deployer, accounts);
-};
+}
 
 function latestTime() {
 	  return web3.eth.getBlock('latest').timestamp;
@@ -19,24 +18,26 @@ const duration = {
 	  days:    function(val) { return val * this.hours(24) },
 	  weeks:   function(val) { return val * this.days(7) },
 	  years:   function(val) { return val * this.days(365)} 
-};
+}
 
-async function liveDeploy(deployer, accounts) {
-  const RATE = 5000;
-	const openTime = latestTime() + duration.minutes(1);
-	const closeTime = openTime + duration.weeks(1);
-	const totalCap = 5000;
-	console.log([openTime, closeTime, totalCap]);
-	return deployer.deploy(
-		UppsalaCrowdsale, 
-		RATE,
-		openTime,
-		closeTime, 
-		totalCap,
-		UppsalaToken,
-		accounts[0]).then( async() => {
-			const instance = await UppsalaCrowdsale.deployed();
-			const token = await instance.token.call();
-			console.log('Token Address:',token);
+function liveDeploy(deployer,accounts ) {
+	console.log(UppsalaToken);
+	console.log(UppsalaCrowdsale);
+	deployer.deploy(UppsalaToken).then(function() {
+		const RATE = 5000;
+		const openTime = latestTime() + duration.minutes(1);
+		const closeTime = openTime + duration.weeks(1);
+		const totalCap = 5000;
+		console.log([openTime, closeTime, totalCap,accounts]);
+		deployer.deploy(UppsalaCrowdsale, RATE, 
+				openTime, 
+				closeTime, 
+				totalCap, 
+				UppsalaToken, 
+				accounts[0]).then( () => {
+			const instance = UppsalaCrowdsale.deployed();
+			const token = instance.token.call();
+			console.log("Token Address: ", token);	
 		});
+	});
 }

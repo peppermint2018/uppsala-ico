@@ -23,18 +23,19 @@ const duration = {
 function liveDeploy(deployer,accounts ) {
 	console.log(UppsalaToken);
 	console.log(UppsalaCrowdsale);
-	deployer.deploy(UppsalaToken).then( function() {
-		const RATE = 5000;
-		const openTime = latestTime() + duration.minutes(1);
-		const closeTime = openTime + duration.weeks(1);
-		const totalCap = 5000;
-		console.log([openTime, closeTime, totalCap,accounts]);
-		deployer.deploy(UppsalaCrowdsale, 
-				RATE, 
-				openTime, 
-				closeTime, 
-				totalCap, 
-				UppsalaToken.address, 
-				accounts[0]);
-		});	
+	const RATE = 1;
+	const openTime = latestTime() + duration.minutes(1);
+	const closeTime = openTime + duration.weeks(1);
+	const totalCap = 5000;
+	return deployer
+		.then( () => {
+		return deployer.deploy(UppsalaToken);
+	}).then( () => {
+		return deployer.deploy(UppsalaCrowdsale, RATE, openTime, closeTime, 
+				totalCap, UppsalaToken.address, accounts[0])
+		.then( () => {
+			console.log( [RATE, openTime, closeTime, totalCap, accounts[0]]);
+			console.log( UppsalaCrowdsale.isDeployed() );
+		})
+	});	
 }

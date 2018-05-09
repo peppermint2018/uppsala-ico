@@ -3,10 +3,21 @@ pragma solidity ^0.4.23;
 import 'zeppelin-solidity/contracts/crowdsale/Crowdsale.sol';
 import 'zeppelin-solidity/contracts/crowdsale/validation/CappedCrowdsale.sol';
 import 'zeppelin-solidity/contracts/crowdsale/validation/TimedCrowdsale.sol';
+import 'zeppelin-solidity/contracts/crowdsale/emission/MintedCrowdsale.sol';
 import 'zeppelin-solidity/contracts/token/ERC20/StandardToken.sol';
 import './UppsalaToken.sol';
 
-contract UppsalaCrowdsale is CappedCrowdsale, TimedCrowdsale {
+contract UppsalaCrowdsale is Crowdsale {
+	function UppsalaCrowdsale(uint256 rate,
+														address account,
+													  StandardToken token)
+														Crowdsale(rate, account, token)
+														{
+														}
+}
+
+/*
+contract UppsalaCrowdsale is MintedCrowdsale, CappedCrowdsale, TimedCrowdsale {
 	using SafeMath for uint256;
 
 	function UppsalaCrowdsale(uint256 rate, 
@@ -21,4 +32,4 @@ contract UppsalaCrowdsale is CappedCrowdsale, TimedCrowdsale {
 	{
 	
   }
-}
+}*/

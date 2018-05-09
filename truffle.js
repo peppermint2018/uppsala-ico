@@ -1,5 +1,9 @@
 module.exports = {
- 	networks: {
+	optimizer: {
+		  "enabled": true,
+			  "runs": 200
+	},
+	networks: {
 		development: {
 			host: "localhost",
 			port: 8545,

@@ -3,11 +3,12 @@ pragma solidity ^0.4.23;
 import 'zeppelin-solidity/contracts/crowdsale/Crowdsale.sol';
 import 'zeppelin-solidity/contracts/crowdsale/validation/CappedCrowdsale.sol';
 import 'zeppelin-solidity/contracts/crowdsale/validation/TimedCrowdsale.sol';
+import 'zeppelin-solidity/contracts/crowdsale/validation/WhitelistedCrowdsale.sol';
 import 'zeppelin-solidity/contracts/token/ERC20/StandardToken.sol';
 import './UppsalaToken.sol';
 import './UserMinMaxCrowdsale.sol';
 
-contract UppsalaPresale is UserMinMaxCrowdsale, CappedCrowdsale, TimedCrowdsale {
+contract UppsalaPresale is WhitelistedCrowdsale, UserMinMaxCrowdsale, CappedCrowdsale, TimedCrowdsale {
 	using SafeMath for uint256;
 
 	mapping(address => uint256) public lockedBalances;

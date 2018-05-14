@@ -34,6 +34,5 @@ contract UppsalaCrowdsale is UserMinMaxCrowdsale, CappedCrowdsale, TimedCrowdsal
 					 CappedCrowdsale(totalCap)
 					 UserMinMaxCrowdsale(userMin, userMax)
 	{
-
   }
 }

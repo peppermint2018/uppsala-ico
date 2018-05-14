@@ -30,8 +30,8 @@ function liveDeploy(deployer,accounts ) {
 	const Rate = 5000;
 	
 	// Bonus = 750 UPP per ether
-	const PresaleBonus = web3.toWei(750,'ether'); 
-	const PresaleLockupReleaseDate = latestTime() + duration.weeks(23);
+	const PresaleBonus = 750; 
+	const PresaleLockupReleaseTime = latestTime() + duration.minutes(1);
 
 	// Time
 	const PresaleOpenTime = latestTime() + duration.minutes(1);
@@ -54,7 +54,7 @@ function liveDeploy(deployer,accounts ) {
 			return deployer.deploy(UppsalaToken);
 		}).then( () => {
 			return deployer.deploy(UppsalaPresale, Rate, PresaleOpenTime, PresaleCloseTime, 
-				PresaleTotalCap, PresaleMin, PresaleMax, accounts[0], UppsalaToken.address);
+				PresaleTotalCap, PresaleMin, PresaleMax, PresaleBonus, PresaleLockupReleaseTime, accounts[0], UppsalaToken.address);
 		}).then( () => {
 			return deployer.deploy(UppsalaCrowdsale, Rate, CrowdsaleOpenTime, CrowdsaleCloseTime,
 				CrowdsaleTotalCap, CrowdsaleMin, CrowdsaleMax, accounts[0], UppsalaToken.address);

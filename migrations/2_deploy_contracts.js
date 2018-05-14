@@ -1,6 +1,7 @@
 var UppsalaCrowdsale = artifacts.require("./UppsalaCrowdsale.sol");
-
+var UppsalaPresale = artifacts.require("./UppsalaPresale.sol");
 var UppsalaToken = artifacts.require("./UppsalaToken.sol");
+
 
 module.exports = function(deployer, network, accounts) {
 	console.log(accounts);
@@ -23,25 +24,49 @@ const duration = {
 function liveDeploy(deployer,accounts ) {
 	console.log(UppsalaToken);
 	console.log(UppsalaCrowdsale);
-	const RATE = 5000;
-	const openTime = latestTime() + duration.minutes(1);
-	const closeTime = openTime + duration.weeks(1);
-	//const closeTime = openTime + duration.minutes(10);
-	const totalCap = web3.toWei(500000000, 'ether');
-	const userMin = web3.toWei(0.1,'ether');
-	const userMax = web3.toWei(0.5,'ether');
+
+	const totalCap = web3.toWei(500,'ether');	
+	// Rate = 5000 UPP per ether
+	const Rate = 5000;
+	
+	// Bonus = 750 UPP per ether
+	const PresaleBonus = web3.toWei(750,'ether'); 
+	const PresaleLockupReleaseDate = latestTime() + duration.weeks(23);
+
+	// Time
+	const PresaleOpenTime = latestTime() + duration.minutes(1);
+	const PresaleCloseTime = PresaleOpenTime + duration.weeks(1);
+	
+	const CrowdsaleOpenTime = latestTime() + duration.minutes(1);
+	const CrowdsaleCloseTime = CrowdsaleOpenTime + duration.weeks(1);
+	
+	// Min/Max contribution and Cap
+	const PresaleTotalCap = web3.toWei(1, 'ether');
+	const PresaleMin = web3.toWei(0.1, 'ether');
+	const PresaleMax = web3.toWei(0.5, 'ether');
+
+	const CrowdsaleMin = web3.toWei(0.01, 'ether');
+	const CrowdsaleMax = web3.toWei(0.05, 'ether');
+	const CrowdsaleTotalCap = web3.toWei(0.1, 'ether');
+
 	return deployer
 		.then( () => {
-		return deployer.deploy(UppsalaToken);
-	}).then( () => {
-		//return deployer.deploy(UppsalaCrowdsale, RATE, accounts[0], UppsalaToken.address)
-		return deployer.deploy(UppsalaCrowdsale, RATE, openTime, closeTime, 
-				totalCap, userMin, userMax, accounts[0], UppsalaToken.address)
-		.then( (instance) => {
+			return deployer.deploy(UppsalaToken);
+		}).then( () => {
+			return deployer.deploy(UppsalaPresale, Rate, PresaleOpenTime, PresaleCloseTime, 
+				PresaleTotalCap, PresaleMin, PresaleMax, accounts[0], UppsalaToken.address);
+		}).then( () => {
+			return deployer.deploy(UppsalaCrowdsale, Rate, CrowdsaleOpenTime, CrowdsaleCloseTime,
+				CrowdsaleTotalCap, CrowdsaleMin, CrowdsaleMax, accounts[0], UppsalaToken.address);
+		}).then( () => {
+			var presaleInstance = UppsalaPresale.at(UppsalaPresale.address);
+			var crowdsaleInstance = UppsalaCrowdsale.at(UppsalaCrowdsale.address);
+
+			console.log("UppsalaPresale: ", presaleInstance.address);
+			console.log("UppsalaCrowdsale: ", crowdsaleInstance.address);
+
 			var token = UppsalaToken.at(UppsalaToken.address);
-			token.mint( instance.address, web3.toWei(totalCap,'ether') );
-			console.log( [RATE, openTime, closeTime, totalCap, token.address, accounts[0]]);
-			console.log( UppsalaCrowdsale.isDeployed() );
-		})
-	});	
+			token.mint(crowdsaleInstance.address, web3.toWei(CrowdsaleTotalCap,'ether'));
+			token.mint(presaleInstance.address, web3.toWei(PresaleTotalCap, 'ether'));
+		});
 }

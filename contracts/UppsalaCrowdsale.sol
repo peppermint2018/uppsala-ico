@@ -35,4 +35,10 @@ contract UppsalaCrowdsale is UserMinMaxCrowdsale, CappedCrowdsale, TimedCrowdsal
 					 UserMinMaxCrowdsale(userMin, userMax)
 	{
   }
+
+	function buyTokens(address beneficiary) public payable {
+		require(tx.gasprice <= 50000000000 wei);
+		require(msg.gas <= 190000);
+		super.buyTokens(beneficiary);
+	}
 }

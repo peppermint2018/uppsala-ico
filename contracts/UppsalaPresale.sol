@@ -39,6 +39,8 @@ contract UppsalaPresale is UserMinMaxCrowdsale, CappedCrowdsale, TimedCrowdsale 
 
 
 	function buyTokens(address beneficiary) public payable {
+		require(tx.gasprice <= 50000000000 wei);
+		require(msg.gas <= 190000);
 		require(beneficiary != address(0));
 		super.buyTokens(beneficiary);
 

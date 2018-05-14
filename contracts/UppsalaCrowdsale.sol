@@ -38,7 +38,9 @@ contract UppsalaCrowdsale is WhitelistedCrowdsale, UserMinMaxCrowdsale, CappedCr
   }
 
 	function buyTokens(address beneficiary) public payable {
+		// limiting gas price
 		require(tx.gasprice <= 50000000000 wei);
+		// limiting gas limt up to around 200000-210000
 		require(msg.gas <= 190000);
 		super.buyTokens(beneficiary);
 	}

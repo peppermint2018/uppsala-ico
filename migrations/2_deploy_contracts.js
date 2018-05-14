@@ -25,29 +25,44 @@ function liveDeploy(deployer,accounts ) {
 	console.log(UppsalaToken);
 	console.log(UppsalaCrowdsale);
 
-	const totalCap = web3.toWei(500,'ether');	
+	// Time
+	//const PresaleOpenTime = latestTime() + duration.minutes(1);
+	//const PresaleCloseTime = PresaleOpenTime + duration.weeks(1);
+	//const CrowdsaleOpenTime = latestTime() + duration.minutes(1);
+	//const CrowdsaleCloseTime = CrowdsaleOpenTime + duration.weeks(1);
+
+	// May 23 21:00 SGT
+	const PresaleOpenTime = 1527080400;
+	// May 26 21:00 SGT
+	const PresaleCloseTime = 1527339600;
+	// May 27 21:00 SGT
+	const CrowdsaleOpenTime = 1527426000;
+	// Jun 10 21:00 SGT
+	const CrowdsaleCloseTime = 1528635600;
+
 	// Rate = 5000 UPP per ether
 	const Rate = 5000;
 	
 	// Bonus = 750 UPP per ether
 	const PresaleBonus = 750; 
-	const PresaleLockupReleaseTime = latestTime() + duration.minutes(1);
-
-	// Time
-	const PresaleOpenTime = latestTime() + duration.minutes(1);
-	const PresaleCloseTime = PresaleOpenTime + duration.weeks(1);
 	
-	const CrowdsaleOpenTime = latestTime() + duration.minutes(1);
-	const CrowdsaleCloseTime = CrowdsaleOpenTime + duration.weeks(1);
-	
-	// Min/Max contribution and Cap
-	const PresaleTotalCap = web3.toWei(1, 'ether');
-	const PresaleMin = web3.toWei(0.1, 'ether');
-	const PresaleMax = web3.toWei(0.5, 'ether');
+	// bonus lock-up ends 180 days after the presale
+	const PresaleLockupReleaseTime = PresaleCloseTime + duration.days(180);
+	//const PresaleLockupReleaseTime = latestTime() + duration.minutes(5);
 
-	const CrowdsaleMin = web3.toWei(0.01, 'ether');
-	const CrowdsaleMax = web3.toWei(0.05, 'ether');
-	const CrowdsaleTotalCap = web3.toWei(0.1, 'ether');
+	// Min/Max contribution (in ethereum)
+	const PresaleMin = web3.toWei(30, 'ether');
+	const PresaleMax = web3.toWei(300, 'ether');
+
+	const CrowdsaleMin = web3.toWei(0.5, 'ether');
+	const CrowdsaleMax = web3.toWei(10, 'ether');
+	
+	// Total cap for presale (in UPP)
+	// We set total cap (the actual cap) - (15% bonus UPP)
+	// 6562500 UPPs are bonus, so we do not include them in the total cap
+	const PresaleTotalCap = web3.toWei(37187500, 'ether');
+	// Total cap for crowdsale (in UPP)
+	const CrowdsaleTotalCap = web3.toWei(39000000, 'ether');
 
 	return deployer
 		.then( () => {
@@ -66,7 +81,12 @@ function liveDeploy(deployer,accounts ) {
 			console.log("UppsalaCrowdsale: ", crowdsaleInstance.address);
 
 			var token = UppsalaToken.at(UppsalaToken.address);
+			
+			// mint UPP as the amount of total crowd sale
 			token.mint(crowdsaleInstance.address, web3.toWei(CrowdsaleTotalCap,'ether'));
+			// mint UPP as the amount of total presale,
+			// The bonus is also minited but will be transfered in the future when the lock has been
+			// released
 			token.mint(presaleInstance.address, web3.toWei(PresaleTotalCap, 'ether'));
 		});
 }

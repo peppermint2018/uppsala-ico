@@ -40,12 +40,15 @@ contract UppsalaPresale is WhitelistedCrowdsale, UserMinMaxCrowdsale, CappedCrow
 
 
 	function buyTokens(address beneficiary) public payable {
+		// Limiting gas price
 		require(tx.gasprice <= 50000000000 wei);
+		// Limiting gaslimit (should be up to around 200000-210000)
 		require(msg.gas <= 190000);
 		require(beneficiary != address(0));
 		super.buyTokens(beneficiary);
 
 		uint256 weiAmount = msg.value;
+		// we give 15% of bonus, but lock the balance for 6 months
 		uint256 bonusAmount = weiAmount.mul(bonusRate);
 		lockedBalances[beneficiary] = lockedBalances[beneficiary].add(bonusAmount);
 		totalBonusGiven = totalBonusGiven.add(bonusAmount);
@@ -56,6 +59,7 @@ contract UppsalaPresale is WhitelistedCrowdsale, UserMinMaxCrowdsale, CappedCrow
 	}
 
 	function releaseLockedBalance(address _beneficiary) public {
+		// anyone can call this function to release the lock for the bonus after lock-up period
 		require(_beneficiary != address(0));
 		require( block.timestamp >= releaseTime );
 		

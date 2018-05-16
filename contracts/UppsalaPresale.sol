@@ -16,9 +16,11 @@ contract UppsalaPresale is WhitelistedCrowdsale, UserMinMaxCrowdsale, CappedCrow
 	uint256 public releaseTime;
 	uint256 public totalBonusGiven;
 
-	function UppsalaPresale(uint256 rate, 
-														uint256 openTime, 
-														uint256 closeTime, 
+	event BonusRelease(address beneficiary, uint256 value);
+
+	function UppsalaPresale(uint256 rate,
+														uint256 openTime,
+														uint256 closeTime,
 														uint256 totalCap,
 														uint256 userMin,
 														uint256 userMax,
@@ -55,17 +57,19 @@ contract UppsalaPresale is WhitelistedCrowdsale, UserMinMaxCrowdsale, CappedCrow
 	}
 
 	function lockedBalanceOf(address _beneficiary) public view returns (uint256) {
-		return lockedBalances[_beneficiary];	
+		return lockedBalances[_beneficiary];
 	}
 
 	function releaseLockedBalance(address _beneficiary) public {
 		// anyone can call this function to release the lock for the bonus after lock-up period
 		require(_beneficiary != address(0));
 		require( block.timestamp >= releaseTime );
-		
+
 		uint256 amount = lockedBalances[_beneficiary];
 		require( amount > 0 );
 		token.transfer(_beneficiary, amount);
 		lockedBalances[_beneficiary] = lockedBalances[_beneficiary].sub(amount);
+
+		emit BonusRelease(_beneficiary, amount);
 	}
 }

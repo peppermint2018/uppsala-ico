@@ -61,6 +61,7 @@ function liveDeploy(deployer,accounts ) {
 	// We set total cap (the actual cap) - (15% bonus UPP)
 	// 6562500 UPPs are bonus, so we do not include them in the total cap
 	const PresaleTotalCap = web3.toWei(37187500, 'ether');
+	const PresaleTotalMint = web3.toWei(43750000, 'ether');
 	// Total cap for crowdsale (in UPP)
 	const CrowdsaleTotalCap = web3.toWei(39000000, 'ether');
 
@@ -83,10 +84,10 @@ function liveDeploy(deployer,accounts ) {
 			var token = UppsalaToken.at(UppsalaToken.address);
 			
 			// mint UPP as the amount of total crowd sale
-			token.mint(crowdsaleInstance.address, web3.toWei(CrowdsaleTotalCap,'ether'));
+			token.mint(crowdsaleInstance.address, CrowdsaleTotalCap);
 			// mint UPP as the amount of total presale,
 			// The bonus is also minited but will be transfered in the future when the lock has been
 			// released
-			token.mint(presaleInstance.address, web3.toWei(PresaleTotalCap, 'ether'));
+			token.mint(presaleInstance.address, PresaleTotalMint);
 		});
 }

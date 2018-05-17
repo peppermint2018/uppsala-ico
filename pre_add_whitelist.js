@@ -6,7 +6,7 @@ module.exports = function(callback) {
 	var pre = UppsalaPresale.at(UppsalaPresale.address)
 	var crowd	 = UppsalaCrowdsale.at(UppsalaCrowdsale.address)
 
-	var array = fs.readFileSync('whitelist.txt').toString().split("\n");
+	var array = fs.readFileSync('prelist.txt').toString().split("\n");
 
 	var i = 0;
 	

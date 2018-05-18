@@ -1,4 +1,4 @@
-pragma solidity ^0.4.23;
+pragma solidity 0.4.23;
 
 import "zeppelin-solidity/contracts/crowdsale/validation/CappedCrowdsale.sol";
 import "zeppelin-solidity/contracts/ownership/Ownable.sol";
@@ -8,7 +8,7 @@ contract UserMinMaxCrowdsale is Crowdsale, Ownable {
 
 	uint256 public min;
   uint256 public max;
-  
+
 	mapping(address => uint256) public contributions;
 
 	function UserMinMaxCrowdsale(uint256 _min, uint256 _max) public {
@@ -18,7 +18,7 @@ contract UserMinMaxCrowdsale is Crowdsale, Ownable {
 		min = _min;
 		max = _max;
 	}
- 
+
 	function getUserContribution(address _beneficiary) public view returns (uint256) {
     return contributions[_beneficiary];
   }

@@ -1,4 +1,4 @@
-pragma solidity ^0.4.23;
+pragma solidity 0.4.23;
 
 import 'zeppelin-solidity/contracts/crowdsale/Crowdsale.sol';
 import 'zeppelin-solidity/contracts/crowdsale/validation/CappedCrowdsale.sol';
@@ -19,6 +19,7 @@ contract UppsalaPresale is WhitelistedCrowdsale, UserMinMaxCrowdsale, CappedCrow
   uint256 public releaseTime;
   uint256 public totalBonusGiven;
 
+	event BonusRelease(address beneficiary, uint256 value);
   function UppsalaPresale(uint256 rate, 
                           uint256 openTime, 
                           uint256 closeTime, 
@@ -33,7 +34,7 @@ contract UppsalaPresale is WhitelistedCrowdsale, UserMinMaxCrowdsale, CappedCrow
            Crowdsale(rate, account, token)
            TimedCrowdsale(openTime, closeTime)
            CappedCrowdsale(totalCap)
-           UserMinMaxCrowdsale(userMin, userMax)
+           UserMinMaxCrowdsale(userMin, userMax) public
   {
     require(_bonusRate > 0);
     require(_releaseTime > block.timestamp);
@@ -87,7 +88,9 @@ contract UppsalaPresale is WhitelistedCrowdsale, UserMinMaxCrowdsale, CappedCrow
     
     uint256 amount = lockedBalances[_beneficiary];
     require( amount > 0 );
-    token.transfer(_beneficiary, amount);
-    lockedBalances[_beneficiary] = lockedBalances[_beneficiary].sub(amount);
+		lockedBalances[_beneficiary] = 0;
+		token.transfer(_beneficiary, amount);
+
+		emit BonusRelease(_beneficiary, amount);
   }
 }

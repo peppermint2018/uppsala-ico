@@ -64,13 +64,13 @@ function liveDeploy(deployer,accounts ) {
 	// Total cap for presale (in ETH)
 	// We set total cap (the actual cap) - (15% bonus UPP) in UPP
 	// and devide it by 5000 to get the actual cap in ETH
-	const PresaleTotalCap = web3.toWei(43750000/1.15/5000, 'ether');
+	const PresaleTotalCap = web3.toWei(7608, 'ether');
 	// Total cap for crowdsale (in ETH)
 	const CrowdsaleTotalCap = web3.toWei(7800, 'ether');
 
-	// Total UPP tokens to mint
-	const PresaleTotalMint = web3.toWei(43750000, 'ether');
-	const CrowdsaleTotalMint = web3.toWei(39000000, 'ether');
+	// Total UPP tokens to mint (Actual cap and bonus multiply with rate)
+	const PresaleTotalMint = web3.toWei(7608*1.15*5000, 'ether');
+	const CrowdsaleTotalMint = web3.toWei(7800*5000, 'ether');
 	
 	return deployer
 		.then( () => {

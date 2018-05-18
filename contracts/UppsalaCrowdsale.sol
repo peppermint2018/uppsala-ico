@@ -1,4 +1,4 @@
-pragma solidity ^0.4.23;
+pragma solidity 0.4.23;
 
 import 'zeppelin-solidity/contracts/crowdsale/Crowdsale.sol';
 import 'zeppelin-solidity/contracts/crowdsale/validation/CappedCrowdsale.sol';
@@ -27,7 +27,7 @@ contract UppsalaCrowdsale is WhitelistedCrowdsale, UserMinMaxCrowdsale, CappedCr
            Crowdsale(rate, account, token)
            TimedCrowdsale(openTime, closeTime)
            CappedCrowdsale(totalCap)
-           UserMinMaxCrowdsale(userMin, userMax)
+           UserMinMaxCrowdsale(userMin, userMax) public
   {
     require(_withdrawTime > block.timestamp);
     withdrawTime = _withdrawTime;

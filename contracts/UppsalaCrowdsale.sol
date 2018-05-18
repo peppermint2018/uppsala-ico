@@ -1,4 +1,4 @@
-pragma solidity ^0.4.23;
+pragma solidity 0.4.23;
 
 import 'zeppelin-solidity/contracts/crowdsale/Crowdsale.sol';
 import 'zeppelin-solidity/contracts/crowdsale/validation/CappedCrowdsale.sol';
@@ -22,9 +22,9 @@ contract UppsalaCrowdsale is Crowdsale {
 contract UppsalaCrowdsale is WhitelistedCrowdsale, UserMinMaxCrowdsale, CappedCrowdsale, TimedCrowdsale {
 	using SafeMath for uint256;
 
-	function UppsalaCrowdsale(uint256 rate, 
-														uint256 openTime, 
-														uint256 closeTime, 
+	function UppsalaCrowdsale(uint256 rate,
+														uint256 openTime,
+														uint256 closeTime,
 														uint256 totalCap,
 														uint256 userMin,
 														uint256 userMax,
@@ -33,7 +33,7 @@ contract UppsalaCrowdsale is WhitelistedCrowdsale, UserMinMaxCrowdsale, CappedCr
 					 Crowdsale(rate, account, token)
 				   TimedCrowdsale(openTime, closeTime)
 					 CappedCrowdsale(totalCap)
-					 UserMinMaxCrowdsale(userMin, userMax)
+					 UserMinMaxCrowdsale(userMin, userMax) public
 	{
   }
 

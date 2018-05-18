@@ -9,63 +9,85 @@ import './UppsalaToken.sol';
 import './UserMinMaxCrowdsale.sol';
 
 contract UppsalaPresale is WhitelistedCrowdsale, UserMinMaxCrowdsale, CappedCrowdsale, TimedCrowdsale {
-	using SafeMath for uint256;
+  using SafeMath for uint256;
 
-	mapping(address => uint256) public lockedBalances;
-	uint256 public bonusRate;
-	uint256 public releaseTime;
-	uint256 public totalBonusGiven;
+  mapping(address => uint256) public balances;
+  mapping(address => uint256) public lockedBalances;
+  
+  uint256 public bonusRate;
+  uint256 public withdrawTime;
+  uint256 public releaseTime;
+  uint256 public totalBonusGiven;
 
-	function UppsalaPresale(uint256 rate, 
-														uint256 openTime, 
-														uint256 closeTime, 
-														uint256 totalCap,
-														uint256 userMin,
-														uint256 userMax,
-														uint256 _bonusRate,
-														uint256 _releaseTime,
-														address account,
-													 	StandardToken token)
-					 Crowdsale(rate, account, token)
-				   TimedCrowdsale(openTime, closeTime)
-					 CappedCrowdsale(totalCap)
-					 UserMinMaxCrowdsale(userMin, userMax)
-	{
-		require( _bonusRate > 0 );
-		require(_releaseTime > block.timestamp);
- 		bonusRate = _bonusRate;
-		releaseTime = _releaseTime;
-		totalBonusGiven = 0;
-	}
+  function UppsalaPresale(uint256 rate, 
+                          uint256 openTime, 
+                          uint256 closeTime, 
+                          uint256 totalCap,
+                          uint256 userMin,
+                          uint256 userMax,
+                          uint256 _withdrawTime,
+                          uint256 _bonusRate,
+                          uint256 _releaseTime,
+                          address account,
+                          StandardToken token)
+           Crowdsale(rate, account, token)
+           TimedCrowdsale(openTime, closeTime)
+           CappedCrowdsale(totalCap)
+           UserMinMaxCrowdsale(userMin, userMax)
+  {
+    require(_bonusRate > 0);
+    require(_releaseTime > block.timestamp);
+    require(_withdrawTime > block.timestamp);
+    bonusRate = _bonusRate;
+    releaseTime = _releaseTime;
+    withdrawTime = _withdrawTime;
+    totalBonusGiven = 0;
+  }
 
+  function withdrawTokens(address _beneficiary) public {
+    require(block.timestamp > withdrawTime);
+    uint256 amount = balances[_beneficiary];
+    require(amount > 0);
+    balances[_beneficiary] = 0;
+    _deliverTokens(_beneficiary, amount);
+  }
 
-	function buyTokens(address beneficiary) public payable {
-		// Limiting gas price
-		require(tx.gasprice <= 50000000000 wei);
-		// Limiting gaslimit (should be up to around 200000-210000)
-		require(msg.gas <= 190000);
-		require(beneficiary != address(0));
-		super.buyTokens(beneficiary);
+  function _processPurchase(
+    address _beneficiary,
+    uint256 _tokenAmount
+  )
+    internal
+  {
+    balances[_beneficiary] = balances[_beneficiary].add(_tokenAmount);
+  }
 
-		uint256 weiAmount = msg.value;
-		// we give 15% of bonus, but lock the balance for 6 months
-		uint256 bonusAmount = weiAmount.mul(bonusRate);
-		lockedBalances[beneficiary] = lockedBalances[beneficiary].add(bonusAmount);
-		totalBonusGiven = totalBonusGiven.add(bonusAmount);
-	}
+  function buyTokens(address beneficiary) public payable {
+    // Limiting gas price
+    require(tx.gasprice <= 50000000000 wei);
+    // Limiting gaslimit (should be up to around 200000-210000)
+    require(msg.gas <= 190000);
+    require(beneficiary != address(0));
+    super.buyTokens(beneficiary);
 
-	function lockedBalanceOf(address _beneficiary) public view returns (uint256) {
-		return lockedBalances[_beneficiary];	
-	}
+    uint256 weiAmount = msg.value;
+    // we give 15% of bonus, but lock the balance for 6 months
+    uint256 bonusAmount = weiAmount.mul(bonusRate);
+    lockedBalances[beneficiary] = lockedBalances[beneficiary].add(bonusAmount);
+    totalBonusGiven = totalBonusGiven.add(bonusAmount);
+  }
 
-	function releaseLockedBalance(address _beneficiary) public {
-		// anyone can call this function to release the lock for the bonus after lock-up period
-		require(_beneficiary != address(0));
-		require( block.timestamp >= releaseTime );
-		
-		uint256 amount = lockedBalances[_beneficiary];
-		require( amount > 0 );
-		token.transfer(_beneficiary, amount);
-		lockedBalances[_beneficiary] = lockedBalances[_beneficiary].sub(amount);
-	}
+  function lockedBalanceOf(address _beneficiary) public view returns (uint256) {
+    return lockedBalances[_beneficiary];  
+  }
+
+  function releaseLockedBalance(address _beneficiary) public {
+    // anyone can call this function to release the lock for the bonus after lock-up period
+    require(_beneficiary != address(0));
+    require( block.timestamp >= releaseTime );
+    
+    uint256 amount = lockedBalances[_beneficiary];
+    require( amount > 0 );
+    token.transfer(_beneficiary, amount);
+    lockedBalances[_beneficiary] = lockedBalances[_beneficiary].sub(amount);
+  }
 }

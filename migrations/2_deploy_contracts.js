@@ -30,7 +30,10 @@ function liveDeploy(deployer,accounts ) {
 	//const PresaleCloseTime = PresaleOpenTime + duration.weeks(1);
 	//const CrowdsaleOpenTime = latestTime() + duration.minutes(1);
 	//const CrowdsaleCloseTime = CrowdsaleOpenTime + duration.weeks(1);
+	//const withdrawTime = latestTime() + duration.minutes(5);
 
+	// Jun 29 21:00 SGT
+	const withdrawTime = 1530277200;
 	// May 23 21:00 SGT
 	const PresaleOpenTime = 1527080400;
 	// May 26 21:00 SGT
@@ -39,6 +42,7 @@ function liveDeploy(deployer,accounts ) {
 	const CrowdsaleOpenTime = 1527426000;
 	// Jun 10 21:00 SGT
 	const CrowdsaleCloseTime = 1528635600;
+
 
 	// Rate = 5000 UPP per ether
 	const Rate = 5000;
@@ -72,11 +76,17 @@ function liveDeploy(deployer,accounts ) {
 		.then( () => {
 			return deployer.deploy(UppsalaToken);
 		}).then( () => {
-			return deployer.deploy(UppsalaPresale, Rate, PresaleOpenTime, PresaleCloseTime, 
-				PresaleTotalCap, PresaleMin, PresaleMax, PresaleBonus, PresaleLockupReleaseTime, accounts[0], UppsalaToken.address);
+			return deployer.deploy(UppsalaPresale, Rate, 
+					PresaleOpenTime, PresaleCloseTime, 
+				PresaleTotalCap, PresaleMin, PresaleMax, 
+				withdrawTime,
+				PresaleBonus, PresaleLockupReleaseTime, accounts[0], UppsalaToken.address);
 		}).then( () => {
-			return deployer.deploy(UppsalaCrowdsale, Rate, CrowdsaleOpenTime, CrowdsaleCloseTime,
-				CrowdsaleTotalCap, CrowdsaleMin, CrowdsaleMax, accounts[0], UppsalaToken.address);
+			return deployer.deploy(UppsalaCrowdsale, Rate, 
+					CrowdsaleOpenTime, CrowdsaleCloseTime,
+				CrowdsaleTotalCap, CrowdsaleMin, CrowdsaleMax, 
+				withdrawTime,
+				accounts[0], UppsalaToken.address);
 		}).then( () => {
 			var presaleInstance = UppsalaPresale.at(UppsalaPresale.address);
 			var crowdsaleInstance = UppsalaCrowdsale.at(UppsalaCrowdsale.address);

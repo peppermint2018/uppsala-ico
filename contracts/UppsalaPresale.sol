@@ -5,10 +5,12 @@ import 'zeppelin-solidity/contracts/crowdsale/validation/CappedCrowdsale.sol';
 import 'zeppelin-solidity/contracts/crowdsale/validation/TimedCrowdsale.sol';
 import 'zeppelin-solidity/contracts/crowdsale/validation/WhitelistedCrowdsale.sol';
 import 'zeppelin-solidity/contracts/token/ERC20/StandardToken.sol';
+import 'zeppelin-solidity/contracts/lifecycle/Pausable.sol';
 import './UppsalaToken.sol';
 import './UserMinMaxCrowdsale.sol';
 
-contract UppsalaPresale is WhitelistedCrowdsale, UserMinMaxCrowdsale, CappedCrowdsale, TimedCrowdsale {
+contract UppsalaPresale is WhitelistedCrowdsale, UserMinMaxCrowdsale, CappedCrowdsale,
+TimedCrowdsale, Pausable {
   using SafeMath for uint256;
 
   mapping(address => uint256) public balances;
@@ -62,10 +64,10 @@ contract UppsalaPresale is WhitelistedCrowdsale, UserMinMaxCrowdsale, CappedCrow
     balances[_beneficiary] = balances[_beneficiary].add(_tokenAmount);
   }
 
-  function buyTokens(address beneficiary) public payable {
-    // Limiting gas price
+  function buyTokens(address beneficiary) public payable whenNotPaused {
+		// Limiting gas price
     require(tx.gasprice <= 50000000000 wei);
-    // Limiting gaslimit (should be up to around 200000-210000)
+		 // Limiting gaslimit (should be up to around 200000-210000)
     require(msg.gas <= 190000);
     require(beneficiary != address(0));
     super.buyTokens(beneficiary);
@@ -85,7 +87,6 @@ contract UppsalaPresale is WhitelistedCrowdsale, UserMinMaxCrowdsale, CappedCrow
     // anyone can call this function to release the lock for the bonus after lock-up period
     require(_beneficiary != address(0));
     require( block.timestamp >= releaseTime );
-    
     uint256 amount = lockedBalances[_beneficiary];
     require( amount > 0 );
 		lockedBalances[_beneficiary] = 0;

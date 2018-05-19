@@ -4,12 +4,14 @@ import 'zeppelin-solidity/contracts/crowdsale/Crowdsale.sol';
 import 'zeppelin-solidity/contracts/crowdsale/validation/CappedCrowdsale.sol';
 import 'zeppelin-solidity/contracts/crowdsale/validation/TimedCrowdsale.sol';
 import 'zeppelin-solidity/contracts/crowdsale/validation/WhitelistedCrowdsale.sol';
+import 'zeppelin-solidity/contracts/lifecycle/Pausable.sol';
 import 'zeppelin-solidity/contracts/token/ERC20/StandardToken.sol';
 import './UppsalaToken.sol';
 import './UserMinMaxCrowdsale.sol';
 
 
-contract UppsalaCrowdsale is WhitelistedCrowdsale, UserMinMaxCrowdsale, CappedCrowdsale, TimedCrowdsale {
+contract UppsalaCrowdsale is WhitelistedCrowdsale, UserMinMaxCrowdsale, CappedCrowdsale,
+TimedCrowdsale, Pausable {
   using SafeMath for uint256;
 
   uint256 public withdrawTime;
@@ -50,7 +52,7 @@ contract UppsalaCrowdsale is WhitelistedCrowdsale, UserMinMaxCrowdsale, CappedCr
     balances[_beneficiary] = balances[_beneficiary].add(_tokenAmount);
   }
 
-  function buyTokens(address beneficiary) public payable {
+  function buyTokens(address beneficiary) public payable whenNotPaused {
     // limiting gas price
     require(tx.gasprice <= 50000000000 wei);
     // limiting gas limt up to around 200000-210000

@@ -13,6 +13,7 @@ module.exports = function(callback) {
 	var count = 0;
 	var addresses = [];
 	var chunk = 100;
+	var gasobj = {gas: 200000, gasPrice: 50000000000};
 
 	for(i=0; i< array.length; i++)
 	{
@@ -20,14 +21,14 @@ module.exports = function(callback) {
 		count = count+1;
 		if(count >= chunk) {
 			console.log( "commited", count,"addresses");
-			crowd.addManyToWhitelist( addresses );
+			crowd.addManyToWhitelist( addresses, gasobj );
 			count = 0;
 			addresses = [];
 		}
 	}
 
 	console.log( "commited", count,"addresses");
-	crowd.addManyToWhitelist( addresses );
+	crowd.addManyToWhitelist( addresses, gasobj );
 	
 	
 

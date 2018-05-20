@@ -7,11 +7,26 @@ module.exports = function(callback) {
 	var crowd	 = UppsalaCrowdsale.at(UppsalaCrowdsale.address)
 
 	var array = fs.readFileSync('prelist.txt').toString().split("\n");
+	//var array = fs.readFileSync('whitelist.txt').toString().split("\n");
 
 	var i = 0;
-	
+	var count = 0;
+	var addresses = [];
+	var chunk = 100;
+
 	for(i=0; i< array.length; i++)
 	{
-		pre.addToWhitelist(array[i]);
+		addresses.push( array[i] );	
+		count = count+1;
+		if(count >= chunk) {
+			console.log( "commited", count,"addresses");
+			pre.addManyToWhitelist( addresses );
+			count = 0;
+			addresses = [];
+		}
 	}
+
+	console.log( "commited", count,"addresses");
+	pre.addManyToWhitelist( addresses );
+
 }

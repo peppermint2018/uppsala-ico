@@ -71,6 +71,11 @@ function liveDeploy(deployer,accounts ) {
 	// Total UPP tokens to mint (Actual cap and bonus multiply with rate)
 	const PresaleTotalMint = web3.toWei(7608*1.15*5000, 'ether');
 	const CrowdsaleTotalMint = web3.toWei(7800*5000, 'ether');
+
+	// address to forward ETH from pre- and crowd sales
+	const SaleFundStore = "0x7a86692F129c8817f4d8bC80Ac3C8F142f3dac25";
+	// address to store the rest of UPP tokens 	
+	const RestFundStore = "0x7a86692F129c8817f4d8bC80Ac3C8F142f3dac25";
 	
 	return deployer
 		.then( () => {
@@ -80,13 +85,16 @@ function liveDeploy(deployer,accounts ) {
 					PresaleOpenTime, PresaleCloseTime, 
 				PresaleTotalCap, PresaleMin, PresaleMax, 
 				withdrawTime,
-				PresaleBonus, PresaleLockupReleaseTime, accounts[0], UppsalaToken.address);
+				PresaleBonus, PresaleLockupReleaseTime,
+				SaleFundStore,
+				UppsalaToken.address);
 		}).then( () => {
 			return deployer.deploy(UppsalaCrowdsale, Rate, 
 					CrowdsaleOpenTime, CrowdsaleCloseTime,
 				CrowdsaleTotalCap, CrowdsaleMin, CrowdsaleMax, 
 				withdrawTime,
-				accounts[0], UppsalaToken.address);
+				SaleFundStore,
+				UppsalaToken.address);
 		}).then( () => {
 			var presaleInstance = UppsalaPresale.at(UppsalaPresale.address);
 			var crowdsaleInstance = UppsalaCrowdsale.at(UppsalaCrowdsale.address);
@@ -102,5 +110,11 @@ function liveDeploy(deployer,accounts ) {
 			// The bonus is also minited but will be transfered in the future when the lock has been
 			// released
 			token.mint(presaleInstance.address, PresaleTotalMint);
+
+			// mint rest of the fund
+			token.mint(RestFundStore, web3.toWei(500000000,'ether') - PresaleTotalMint - CrowdsaleTotalMint);
+			
+			// finish minting. Total supply will be fixed to 500,000,000 UPP
+			token.finishMinting();
 		});
 }
